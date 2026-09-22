@@ -1,0 +1,31 @@
+{
+  "id": "b1111111-2222-4333-8444-555566667777",
+  "name": "api001-votacao - LOCAL",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "contextPath",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "pautaId",
+      "value": "1",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "associadoId",
+      "value": "12345678900",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

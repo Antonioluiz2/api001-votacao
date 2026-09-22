@@ -1,0 +1,31 @@
+{
+  "id": "d3333333-4444-4555-8666-777788889999",
+  "name": "api001-votacao - HOMOLOG",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "https://api001-votacao.homolog.paas.cnpbrasil.intranet",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "contextPath",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "pautaId",
+      "value": "1",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "associadoId",
+      "value": "12345678900",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}
