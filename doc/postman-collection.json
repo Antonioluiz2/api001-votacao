@@ -1,0 +1,870 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-4789-90ab-cdef01234567",
+    "name": "api001-votacao API",
+    "description": "Coleção gerada automaticamente a partir do código-fonte Spring Boot do projeto api001-votacao (sistema de votação de pautas de cooperativa). Inclui endpoints REST de Pauta, Sessão de Votação, Voto, Resultado e o protocolo de telas Mobile. Nenhum endpoint requer autenticação (Spring Security não está presente no projeto).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "{{baseUrl}}", "type": "string" },
+    { "key": "contextPath", "value": "", "type": "string" },
+    { "key": "pautaId", "value": "1", "type": "string" },
+    { "key": "associadoId", "value": "12345678900", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Pauta",
+      "item": [
+        {
+          "name": "Cadastrar nova pauta",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descricao\": \"Aprovação do orçamento anual 2027\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas"]
+            },
+            "description": "Cadastra uma nova pauta.\n\nRequest body: CriarPautaRequest\n- descricao (String, obrigatório, @NotBlank)\n\nRespostas documentadas: 201 (criada), 400 (payload inválido)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('descricao');",
+                  "    pm.expect(jsonData).to.have.property('dataCriacao');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('pautaId', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cadastrar nova pauta - payload inválido (descricao em branco)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descricao\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas"]
+            },
+            "description": "Caso de erro: descricao em branco deve retornar 400 (violação de @NotBlank)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response has error shape', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status');",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar pauta pelo id",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/{{pautaId}}",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "{{pautaId}}"]
+            },
+            "description": "Consulta uma pauta pelo id.\n\nPath variable: pautaId (Long)\n\nRespostas documentadas: 200 (encontrada), 404 (não encontrada)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('descricao');",
+                  "    pm.expect(jsonData).to.have.property('dataCriacao');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar pauta pelo id - não encontrada",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/999999",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "999999"]
+            },
+            "description": "Caso de erro: pauta inexistente deve retornar 404."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sessao",
+      "item": [
+        {
+          "name": "Abrir sessao de votacao (duracao customizada)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"duracaoEmSegundos\": 60\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/{{pautaId}}/sessao",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "{{pautaId}}", "sessao"]
+            },
+            "description": "Abre uma sessao de votacao para a pauta.\n\nPath variable: pautaId (Long)\nRequest body: AbrirSessaoRequest (opcional)\n- duracaoEmSegundos (Integer, opcional; se omitido/nulo, default = 60s; deve ser > 0)\n\nRespostas documentadas: 201 (aberta), 404 (pauta não encontrada), 409 (pauta já possui sessão)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('pautaId');",
+                  "    pm.expect(jsonData).to.have.property('inicio');",
+                  "    pm.expect(jsonData).to.have.property('fim');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('sessaoId', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Abrir sessao de votacao (sem body - duracao default)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/{{pautaId}}/sessao",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "{{pautaId}}", "sessao"]
+            },
+            "description": "Abre uma sessao de votacao sem informar duracao (body omitido). O serviço aplica duração default de 60 segundos."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 or 409 (se ja existir sessao)', function () {",
+                  "    pm.expect([201, 409]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Abrir sessao de votacao - pauta ja possui sessao (conflito)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"duracaoEmSegundos\": 60\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/{{pautaId}}/sessao",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "{{pautaId}}", "sessao"]
+            },
+            "description": "Caso de erro: reabrir sessão para uma pauta que já possui sessão aberta deve retornar 409. Execute este request após já ter aberto uma sessão para a mesma pautaId."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 409', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Abrir sessao de votacao - pauta nao encontrada",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"duracaoEmSegundos\": 60\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/999999/sessao",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "999999", "sessao"]
+            },
+            "description": "Caso de erro: pauta inexistente deve retornar 404."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Voto",
+      "item": [
+        {
+          "name": "Registrar voto do associado",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"associadoId\": \"{{associadoId}}\",\n  \"tipo\": \"SIM\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/{{pautaId}}/votos",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "{{pautaId}}", "votos"]
+            },
+            "description": "Registra o voto de um associado em uma pauta.\n\nPath variable: pautaId (Long)\nRequest body: RegistrarVotoRequest\n- associadoId (String, obrigatório, @NotBlank)\n- tipo (enum TipoVoto: SIM | NAO, obrigatório, @NotNull)\n\nRespostas documentadas: 201 (registrado), 400 (payload inválido), 404 (pauta/sessão não encontrada), 409 (sessão encerrada ou voto duplicado)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('pautaId');",
+                  "    pm.expect(jsonData).to.have.property('associadoId');",
+                  "    pm.expect(jsonData).to.have.property('tipo');",
+                  "    pm.expect(jsonData).to.have.property('dataHora');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar voto - payload invalido (tipo ausente)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"associadoId\": \"{{associadoId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/{{pautaId}}/votos",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "{{pautaId}}", "votos"]
+            },
+            "description": "Caso de erro: campo 'tipo' ausente deve retornar 400 (violação de @NotNull)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar voto - voto duplicado do mesmo associado (conflito)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"associadoId\": \"{{associadoId}}\",\n  \"tipo\": \"NAO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/{{pautaId}}/votos",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "{{pautaId}}", "votos"]
+            },
+            "description": "Caso de erro: votar novamente com o mesmo associadoId na mesma pauta deve retornar 409 (constraint unique pauta_id + associado_id). Execute após 'Registrar voto do associado' com o mesmo associadoId."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 409', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar voto - sessao encerrada ou nao encontrada",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"associadoId\": \"98765432100\",\n  \"tipo\": \"SIM\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/999999/votos",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "999999", "votos"]
+            },
+            "description": "Caso de erro: pauta/sessão inexistente deve retornar 404. Se a sessão da pauta informada já estiver encerrada, o serviço retorna 409."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 or 409', function () {",
+                  "    pm.expect([404, 409]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Resultado",
+      "item": [
+        {
+          "name": "Consultar resultado da votacao",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/{{pautaId}}/resultado",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "{{pautaId}}", "resultado"]
+            },
+            "description": "Consulta o resultado (parcial ou final) da votacao de uma pauta.\n\nPath variable: pautaId (Long)\n\nRespostas documentadas: 200 (calculado), 404 (pauta não encontrada)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('pautaId');",
+                  "    pm.expect(jsonData).to.have.property('sim');",
+                  "    pm.expect(jsonData).to.have.property('nao');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "});",
+                  "",
+                  "pm.test('total equals sim + nao', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.total).to.eql(jsonData.sim + jsonData.nao);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar resultado - pauta nao encontrada",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/pautas/999999/resultado",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "pautas", "999999", "resultado"]
+            },
+            "description": "Caso de erro: pauta inexistente deve retornar 404."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mobile",
+      "item": [
+        {
+          "name": "Tela inicial (SELECAO) - lista de pautas",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/mobile/inicio",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "mobile", "inicio"]
+            },
+            "description": "Tela inicial com a lista de pautas (protocolo de tela SELECAO). Retorna SelecaoScreen com itens contendo URLs absolutas construídas a partir de app.callback.base-url."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a SELECAO screen', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.tipo).to.eql('SELECAO');",
+                  "    pm.expect(jsonData).to.have.property('titulo');",
+                  "    pm.expect(jsonData).to.have.property('itens');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tela de cadastro de nova pauta (FORMULARIO)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/mobile/pautas/nova",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "mobile", "pautas", "nova"]
+            },
+            "description": "Tela de cadastro de nova pauta (protocolo de tela FORMULARIO). Retorna FormularioScreen com o campo 'descricao' e botões de ação (botaoOk -> POST /api/v1/pautas)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a FORMULARIO screen', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.tipo).to.eql('FORMULARIO');",
+                  "    pm.expect(jsonData).to.have.property('itens');",
+                  "    pm.expect(jsonData).to.have.property('botaoOk');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tela de acoes disponiveis para a pauta (SELECAO)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/mobile/pautas/{{pautaId}}/acoes",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "mobile", "pautas", "{{pautaId}}", "acoes"]
+            },
+            "description": "Tela de acoes disponiveis para a pauta (protocolo de tela SELECAO).\n\nPath variable: pautaId (Long)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a SELECAO screen', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.tipo).to.eql('SELECAO');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tela de abertura de sessao de votacao (FORMULARIO)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/mobile/pautas/{{pautaId}}/abrir-sessao/formulario",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "mobile", "pautas", "{{pautaId}}", "abrir-sessao", "formulario"]
+            },
+            "description": "Tela de abertura de sessao de votacao (protocolo de tela FORMULARIO).\n\nPath variable: pautaId (Long)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a FORMULARIO screen', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.tipo).to.eql('FORMULARIO');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tela de votacao do associado (FORMULARIO)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/mobile/pautas/{{pautaId}}/votar/formulario",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "mobile", "pautas", "{{pautaId}}", "votar", "formulario"]
+            },
+            "description": "Tela de votacao do associado (protocolo de tela FORMULARIO).\n\nPath variable: pautaId (Long)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a FORMULARIO screen', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.tipo).to.eql('FORMULARIO');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tela de resultado da votacao (FORMULARIO)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/api/v1/mobile/pautas/{{pautaId}}/resultado",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["api", "v1", "mobile", "pautas", "{{pautaId}}", "resultado"]
+            },
+            "description": "Tela de resultado da votacao (protocolo de tela FORMULARIO).\n\nPath variable: pautaId (Long)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a FORMULARIO screen', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.tipo).to.eql('FORMULARIO');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Actuator",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/actuator/health",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Endpoint de health check exposto via Spring Boot Actuator (management.endpoints.web.exposure.include: health,info)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Status is UP', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('UP');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{contextPath}}/actuator/info",
+              "host": ["{{baseUrl}}{{contextPath}}"],
+              "path": ["actuator", "info"]
+            },
+            "description": "Endpoint de info exposto via Spring Boot Actuator."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

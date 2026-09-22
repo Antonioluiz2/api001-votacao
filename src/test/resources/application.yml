@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+app:
+  callback:
+    base-url: http://localhost:8080
+  userinfo:
+    enabled: false
+    base-url: https://user-info.herokuapp.com
+    timeout-ms: 3000
+
+logging:
+  level:
+    root: WARN
+    br.com.cooperativa.votacao: DEBUG
